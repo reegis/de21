@@ -25,7 +25,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 # oemof libraries
 from oemof import solph
-from oemof.tools import logger
+from oemof.network import graph
 
 if sys.getrecursionlimit() < 3000:
     sys.setrecursionlimit(3000)
@@ -227,9 +227,9 @@ class Scenario:
         self.model.solve(
             solver=solver, solve_kwargs={"tee": tee, "logfile": logfile}
         )
-        self.es.results["main"] = outputlib.processing.results(self.model)
-        self.es.results["meta"] = outputlib.processing.meta_results(self.model)
-        self.es.results["param"] = outputlib.processing.parameter_as_dict(
+        self.es.results["main"] = solph.processing.results(self.model)
+        self.es.results["meta"] = solph.processing.meta_results(self.model)
+        self.es.results["param"] = solph.processing.parameter_as_dict(
             self.es
         )
         self.es.results["meta"]["scenario"] = self.scenario_info(solver)
@@ -237,7 +237,7 @@ class Scenario:
         self.es.results["meta"]["file_date"] = datetime.datetime.fromtimestamp(
             os.path.getmtime(self.location)
         )
-        self.es.results["meta"]["oemof_version"] = logger.get_version()
+        # self.es.results["meta"]["oemof_version"] = logger.get_version()
         self.results = self.es.results["main"]
 
     def plot_nodes(self, show=None, filename=None, **kwargs):
@@ -341,7 +341,7 @@ def add_volatile_sources(table_collection, nodes):
             vs_label = Label("source", "ee", vs_type, region)
             capacity = vs.loc["capacity", (region, vs_type)]
             try:
-                feedin = table_collection["volatile_series"][region, vs_type]
+                feedin = table_collection["time_series"][region, vs_type]
             except KeyError:
                 if capacity > 0:
                     msg = "Missing time series for {0} (capacity: {1}) in {2}."
@@ -355,9 +355,8 @@ def add_volatile_sources(table_collection, nodes):
                     label=vs_label,
                     outputs={
                         nodes[bus_label]: solph.Flow(
-                            actual_value=feedin,
+                            fix=feedin,
                             nominal_value=capacity,
-                            fixed=True,
                             emission=0,
                         )
                     },
@@ -367,8 +366,8 @@ def add_volatile_sources(table_collection, nodes):
 def add_decentralised_heating_systems(table_collection, nodes, extra_regions):
     logging.debug("Add decentralised_heating_systems to nodes dictionary.")
     cs = table_collection["commodity_source"]["DE"]
-    dts = table_collection["demand_series"]
-    dh = table_collection["decentralised_heat"]
+    dts = table_collection["time_series"]
+    dh = table_collection["decentralised_heating"]
     demand_regions = list({"DE_demand"}.union(set(extra_regions)))
 
     for d_region in demand_regions:
@@ -418,9 +417,8 @@ def add_decentralised_heating_systems(table_collection, nodes, extra_regions):
                 label=d_heat_demand_label,
                 inputs={
                     nodes[heat_bus_label]: solph.Flow(
-                        actual_value=dts[d_region, fuel],
+                        fix=dts[d_region, fuel],
                         nominal_value=1,
-                        fixed=True,
                     )
                 },
             )
@@ -428,7 +426,7 @@ def add_decentralised_heating_systems(table_collection, nodes, extra_regions):
 
 def add_electricity_demand(table_collection, nodes):
     logging.debug("Add local electricity demand to nodes dictionary.")
-    dts = table_collection["demand_series"]
+    dts = table_collection["time_series"]
     dts.columns = dts.columns.swaplevel()
     for region in dts["electrical_load"].columns:
         if dts["electrical_load"][region].sum() > 0:
@@ -440,9 +438,8 @@ def add_electricity_demand(table_collection, nodes):
                 label=elec_demand_label,
                 inputs={
                     nodes[bus_label]: solph.Flow(
-                        actual_value=dts["electrical_load", region],
+                        fix=dts["electrical_load", region],
                         nominal_value=1,
-                        fixed=True,
                     )
                 },
             )
@@ -450,7 +447,7 @@ def add_electricity_demand(table_collection, nodes):
 
 def add_district_heating_systems(table_collection, nodes):
     logging.debug("Add district heating systems to nodes dictionary.")
-    dts = table_collection["demand_series"]
+    dts = table_collection["time_series"]
     for region in dts["district heating"].columns:
         if dts["district heating"][region].sum() > 0:
             bus_label = Label("bus", "heat", "district", region)
@@ -461,9 +458,8 @@ def add_district_heating_systems(table_collection, nodes):
                 label=heat_demand_label,
                 inputs={
                     nodes[bus_label]: solph.Flow(
-                        actual_value=dts["district heating", region],
+                        fix=dts["district heating", region],
                         nominal_value=1,
-                        fixed=True,
                     )
                 },
             )
