@@ -9,26 +9,23 @@ SPDX-License-Identifier: MIT
 __copyright__ = "Uwe Krien <krien@uni-bremen.de>"
 __license__ = "MIT"
 
-# Python libraries
-import os
-import sys
 import calendar
 import datetime
-import shutil
-import dill as pickle
-from collections import namedtuple
 import logging
+# Python libraries
+import os
+import shutil
+import sys
+from collections import namedtuple
 
+import dill as pickle
 # External libraries
 import networkx as nx
 import pandas as pd
 from matplotlib import pyplot as plt
-
 # oemof libraries
 from oemof import solph
-from oemof.tools import logger, helpers
-from oemof import outputlib
-from oemof import graph
+from oemof.tools import logger
 
 if sys.getrecursionlimit() < 3000:
     sys.setrecursionlimit(3000)
@@ -220,7 +217,7 @@ class Scenario:
 
         if self.debug:
             filename = os.path.join(
-                helpers.extend_basic_path("lp_files"), "reegis.lp"
+                solph.helpers.extend_basic_path("lp_files"), "reegis.lp"
             )
             logging.info("Store lp-file in {0}.".format(filename))
             self.model.write(

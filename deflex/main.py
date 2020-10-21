@@ -227,4 +227,8 @@ def model_scenario(
 
 
 if __name__ == "__main__":
-    pass
+    fn_xls = "/home/uwe/reegis/phd/deflex_2014_de21.xls"
+    fn_csv = "/home/uwe/reegis/phd/deflex_2014_de21_csv"
+    sc = scenario_tools.DeflexScenario()
+    # sc.load_excel(fn_xls)
+    sc.load_csv(fn_csv)
