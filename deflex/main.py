@@ -122,7 +122,7 @@ def model_scenario(
     xls_file=None,
     csv_path=None,
     res_path=None,
-    name="noname",
+    name=None,
     rmap=None,
     year="unknown",
     es=None,
@@ -174,6 +174,12 @@ def model_scenario(
         "solver": cfg.get("general", "solver"),
         "start_time": datetime.now(),
     }
+
+    if name is None:
+        if csv_path is not None:
+            name = csv_path.split(os.sep)[-1][:-4]
+        elif xls_file is not None:
+            name = xls_file.split(os.sep)[-1][:-4]
 
     sc = scenario_tools.DeflexScenario(name=name, year=2014, meta=meta)
     if es is not None:
