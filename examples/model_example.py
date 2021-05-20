@@ -40,7 +40,7 @@ with ZipFile(fn, "r") as zip_ref:
 logging.info("All v0.3.x scenarios examples extracted to %s.", path)
 
 # Look in your folder above. You should see some scenario files. The csv and
-# the xlsx scenarios are the same. The csv-directories cen be read faster by
+# the xlsx scenarios are the same. The csv-directories can be read faster by
 # the computer but the xlsx-files are easier to read for humans because all
 # sheets are in one file.
 

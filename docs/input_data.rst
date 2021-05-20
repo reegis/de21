@@ -40,7 +40,7 @@ them regional for example to add a specific limit for each region.
 In most cases it is also sufficient to model the fossil part of the mobility
 and the decentralised heating sector supra-regional. It is assumed that a
 gas boiler or a filling station is always supplied with enough fuel, so that
-the only the annual values affect the model. This does not apply to electrical
+only the annual values affect the model. This does not apply to electrical
 heating systems or cars.
 
 In most spread sheet software it is possible to connect cells to increase
@@ -95,9 +95,9 @@ This table contains basic data about the scenario.
 +----------------------+------+
 | year                 |      |
 +----------------------+------+
-| number of time steps |      |
-+----------------------+------+
 | co2 price            |      |
++----------------------+------+
+| number of time steps |      |
 +----------------------+------+
 | name                 |      |
 +----------------------+------+
@@ -105,12 +105,12 @@ This table contains basic data about the scenario.
 **INDEX**
 
 year: ``int``, [-]
-    A time index will be created started with January 1, at 00:00 with the
+    A time index will be created starting with January 1, at 00:00 with the
     number of hours given in `number of time steps`.
-number of time steps: ``int``, [-]
-    The number of hourly time steps.
 co2 price: ``float``, [€/t]
     The average price for CO\ :sub:`2`  over the whole time period.
+number of time steps: ``int``, [-]
+    The number of hourly time steps.
 name: ``str``, [-]
     A name for the scenario. This name will be used to compare key values
     between different scenarios. Therefore, it should be unique within a group
@@ -162,10 +162,10 @@ Commodity sources
 
 ``key:`` 'commodity sources', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
 
-This sheet requires data fromm all the commodities used in the scenario. The
+This sheet requires data from all the commodities used in the scenario. The
 data can be provided either supra-regional under DE, regional under DEXX or as a
 combination of both, where some commodities are global and some are regional.
-Regionalised commodities are specially useful for commodities with an annual
+Regionalised commodities are especially useful for commodities with an annual
 limit, for example bioenergy.
 
 +------+-----------+---------------+------------------+--------------------+
@@ -187,7 +187,7 @@ limit, for example bioenergy.
 level 0: ``str``
     Region (e.g. DE01, DE02 or DE).
 level 1: ``str``
-    Fuel type.
+    Fuel type (e.g. natural gas or bionenergy).
 
 **COLUMNS**
 
@@ -246,7 +246,7 @@ the results.
 +-------------+----------+----------+-----------+----------+----------+-----+
 |             |   DE01   |            DE02                 | DE03     | ... |
 +-------------+----------+----------+-----------+----------+----------+-----+
-|             | all      | indsutry | buildings | rest     | all      | ... |
+|             | all      | industry | buildings | rest     | all      | ... |
 +-------------+----------+----------+-----------+----------+----------+-----+
 | Time step 1 |          |          |           |          |          | ... |
 +-------------+----------+----------+-----------+----------+----------+-----+
@@ -419,7 +419,7 @@ Electricity storages
 
 ``key:`` 'electricity storages', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
 
-A types of electricity storages can be defined in this table. All different
+All types of electricity storages can be defined in this table. All different
 storage technologies (pumped hydro, batteries, compressed air, etc) have to be
 entered in a general way. Each row can indicate one storage or a group of
 storages. It is possible to add additional columns for information purposes.
