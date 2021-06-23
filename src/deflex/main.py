@@ -20,7 +20,7 @@ from datetime import datetime
 import pandas as pd
 
 from deflex import config as cfg
-from deflex import scenario
+from deflex import DeflexScenario
 
 
 def stopwatch():
@@ -64,7 +64,7 @@ def load_scenario(path, file_type=None):
     NotADirectoryError: [Errno 20] Not a directory:
 
     """
-    sc = scenario.DeflexScenario()
+    sc = DeflexScenario()
 
     if path is not None:
         if file_type is None:
@@ -77,7 +77,6 @@ def load_scenario(path, file_type=None):
         logging.info("Reading file: %s", path)
         if file_type == "xlsx":
             sc.read_xlsx(path)
-            sc.to_xlsx(path)
         elif file_type == "csv":
             sc.read_csv(path)
     return sc
@@ -254,8 +253,8 @@ def batch_model_scenario(path, named=True, file_type=None, ignore_errors=True):
     Welcome to the CBC MILP ...
     >>> r.name
     'de02_heat_csv'
-    >>> result_file = r.result_file
-    >>> os.path.basename(result_file)
+    >>> my_result_file = r.result_file
+    >>> os.path.basename(my_result_file)
     'de02_heat.dflx'
     >>> r.trace
     >>> r.return_value.year > 2019

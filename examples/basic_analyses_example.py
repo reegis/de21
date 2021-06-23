@@ -20,9 +20,9 @@ import pytz
 from matplotlib import pyplot as plt
 from oemof.tools import logger
 
-from deflex import analyses
-from deflex import postprocessing as pp
 from deflex import tools
+from deflex.tools import files as pp
+from deflex.postprocessing import analyses
 
 OPSD_URL = (
     "https://data.open-power-system-data.org/index.php?package="
@@ -75,7 +75,7 @@ if not os.path.isfile(my_fn):
     logging.info("All v0.3.x result examples extracted to %s.", my_path)
 
 # Search for all de02-result-files.
-result_files = pp.search_results(path=my_path, map=["de02"])
+result_files = pp.search_scenarios(path=my_path, map=["de02"])
 
 # Restore the results for all found files
 results = pp.restore_results(result_files)

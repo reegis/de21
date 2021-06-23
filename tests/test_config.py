@@ -12,8 +12,7 @@ __license__ = "MIT"
 
 
 import os
-from configparser import NoOptionError
-from configparser import NoSectionError
+from configparser import NoOptionError, NoSectionError
 
 import pytest
 

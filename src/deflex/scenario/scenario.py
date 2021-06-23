@@ -13,7 +13,6 @@ import calendar
 import datetime
 import logging
 import os
-import pprint as pp
 import shutil
 import sys
 import warnings
@@ -24,7 +23,7 @@ from oemof import solph
 from oemof.network import graph
 
 from deflex import config as cfg
-from deflex.nodes import create_solph_nodes_from_data
+from .nodes import create_solph_nodes_from_data
 
 if sys.getrecursionlimit() < 3000:
     sys.setrecursionlimit(3000)
@@ -250,9 +249,7 @@ class Scenario:
 
         """
         self.table2es()
-        logging.info("Creating the linear model...")
-        model = solph.Model(self.es)
-        logging.info("Done. Optimise the model.")
+        model = self.create_model()
         self.solve(model, solver=solver, **kwargs)
 
     def add_nodes_to_es(self, nodes):
@@ -305,7 +302,9 @@ class Scenario:
         solph.Model
 
         """
+        logging.info("Creating the model this may take a while...")
         model = solph.Model(self.es)
+        logging.info("...Done.")
         return model
 
     def compute_debug(self):
@@ -387,7 +386,7 @@ class Scenario:
 
         self.results = self.es.results
 
-    def plot_nodes(self, filename, **kwargs):
+    def plot_nodes(self, filename=None, **kwargs):
         """
         Plot a graph plot of the energy system and store it into a `.graphml`
         file. The kwargs are passed to the oemof.network function
@@ -444,35 +443,4 @@ class DeflexScenario(Scenario):
         return create_solph_nodes_from_data(self.input_data, nodes)
 
 
-def restore_scenario(filename, scenario_class=DeflexScenario):
-    """
-    Create a Scenario from a dump file (`.dflx`). By default a DeflexScenario
-    is created but a different Scenario class can be passed. The Scenario
-    has to be equal to the dumped Scenario otherwise the restore will fail.
 
-    Parameters
-    ----------
-    filename : str
-        The path to the dumped file (`.dflx`).
-    scenario_class : class
-        A child of the deflex.Scenario class or the Scenario class itself.
-
-    Returns
-    -------
-    deflex.Scenario
-
-    """
-    if filename.split(".")[-1] != "dflx":
-        msg = (
-            "The suffix of a valid deflex scenario has to be '.dflx'.\n"
-            "Cannot open {0}.".format(filename)
-        )
-        raise IOError(msg)
-    f = open(filename, "rb")
-    meta = pickle.load(f)
-    logging.info("Meta information:\n %s", pp.pformat(meta))
-    sc = scenario_class()
-    sc.__dict__ = pickle.load(f)
-    f.close()
-    logging.info("Results restored from %s.", filename)
-    return sc

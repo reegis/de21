@@ -1,14 +1,6 @@
 Reference
 =========
 
-deflex.analyses module
-----------------------
-
-.. automodule:: deflex.analyses
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 deflex.config module
 --------------------
 
@@ -34,19 +26,11 @@ deflex.main module
     :undoc-members:
     :show-inheritance:
 
-deflex.nodes module
--------------------
-
-.. automodule:: deflex.nodes
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 deflex.postprocessing module
 ----------------------------
 
 .. automodule:: deflex.postprocessing
-    :members:
+    :members: DeflexGraph, get_all_results
     :undoc-members:
     :show-inheritance:
 
@@ -58,10 +42,10 @@ deflex.scenario module
     :undoc-members:
     :show-inheritance:
 
-deflex.scenario_creator module
+deflex.creator module
 ------------------------------
 
-.. automodule:: deflex.scenario_creator
+.. automodule:: deflex.creator
     :members:
     :undoc-members:
     :show-inheritance:
@@ -70,14 +54,6 @@ deflex.tools module
 -------------------
 
 .. automodule:: deflex.tools
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-deflex.transmission module
---------------------------
-
-.. automodule:: deflex.transmission
     :members:
     :undoc-members:
     :show-inheritance:

@@ -17,8 +17,7 @@ import pandas as pd
 import pytest
 
 from deflex import scenario
-from deflex.tools import TEST_PATH
-from deflex.tools import fetch_test_files
+from deflex.tools import TEST_PATH, fetch_test_files
 
 
 def test_basic_scenario_class():

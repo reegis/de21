@@ -15,17 +15,19 @@ from collections import namedtuple
 
 import pandas as pd
 from reegis import config
-from scenario_builder import commodity
-from scenario_builder import demand
-from scenario_builder import feedin
-from scenario_builder import mobility
-from scenario_builder import powerplants
-from scenario_builder import storages
+from scenario_builder import (
+    commodity,
+    demand,
+    feedin,
+    mobility,
+    powerplants,
+    storages,
+)
 
 from deflex import __file__ as dfile
 from deflex import config as cfg
 from deflex import scenario
-from deflex import transmission
+from deflex.creator import transmission
 
 
 def scenario_default_decentralised_heat():
@@ -118,6 +120,7 @@ def create_scenario(regions, year, name, lines, opsd_version=None):
     table_collection["general"].loc["co2 price", "value"] = cs.pop(
         "co2_price"
     ).iloc[0]
+    cs["emission"] /= 1000
     table_collection["commodity sources"] = cs
     table_collection["volatile series"] = feedin.scenario_feedin(
         regions, year, name

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Processing a list of power plants in Germany.
+"""Download test files.
 
 SPDX-FileCopyrightText: 2016-2021 Uwe Krien <krien@uni-bremen.de>
 
@@ -12,6 +12,8 @@ import os
 from zipfile import ZipFile
 
 import requests
+
+from deflex import config as cfg
 
 TEST_PATH = os.path.join(
     os.path.expanduser("~"), ".deflex", "tmp_test_32traffic_43"
@@ -35,10 +37,7 @@ def fetch_test_files(path):
     """
 
     zip_file = os.path.join(TEST_PATH, "deflex_test_files.zip")
-    zip_url = (
-        "https://files.de-1.osf.io/v1/resources/a5xrj/providers/osfstorage"
-        "/6059eecc818bde00713a7b29?action=download&direct&version=1"
-    )
+    zip_url = cfg.get("url", "osfbase") + cfg.get("url", "tests")
 
     os.makedirs(TEST_PATH, exist_ok=True)
     if ".dflx" in path:

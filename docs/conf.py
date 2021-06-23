@@ -40,6 +40,8 @@ MOCK_MODULES = [
     "networkx",
     "deflex.config",
     "matplotlib",
+    "matplotlib.cm",
+    "matplotlib.colors",
     "oemof",
     "oemof.tools",
     "oemof.network",

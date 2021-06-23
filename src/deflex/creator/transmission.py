@@ -172,7 +172,7 @@ def get_electrical_transmission_renpass(both_directions=False):
     grid = pd.read_csv(
         os.path.join(
             os.path.dirname(__file__),
-            "data",
+            "../data",
             "static",
             "renpass_transmission.csv",
         )

@@ -377,7 +377,7 @@ capacity: ``float``, [MW]
 
 
 Volatile series
-++++++++++++++++
++++++++++++++++
 
 ``key:`` 'volatile series', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
 
@@ -413,61 +413,6 @@ level 0: ``str``
 level 1: ``str``
     Name of the energy source specified in the previous sheet.
 
-
-Electricity storages
-++++++++++++++++++++
-
-``key:`` 'electricity storages', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
-
-A types of electricity storages can be defined in this table. All different
-storage technologies (pumped hydro, batteries, compressed air, etc) have to be
-entered in a general way. Each row can indicate one storage or a group of
-storages. It is possible to add additional columns for information purposes.
-
-+------+-----+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
-|      |     | energy content | energy inflow | charge capacity | discharge capacity | charge efficiency | discharge efficiency | loss rate |
-+------+-----+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
-| DE01 | S1  |                |               |                 |                    |                   |                      |           |
-+------+-----+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
-|      | S2  |                |               |                 |                    |                   |                      |           |
-+------+-----+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
-| DE02 | S2  |                |               |                 |                    |                   |                      |           |
-+------+-----+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
-| ...  | ... | ...            | ...           | ...             | ...                | ...               | ...                  | ...       |
-+------+-----+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
-
-**INDEX**
-
-level 0: ``str``
-    Region (e.g. DE01, DE02).
-level 1: ``str``
-    Name, arbitrary.
-    
-**COLUMNS**
-
-energy content: ``float``, [MWh]
-    The maximum energy content of a storage or a group storages.
-
-energy inflow: ``float``, [MWh]
-    The amount of energy that will feed into the storage of the model period in
-    MWh. For example a river into a pumped hydroelectric energy storage.
-    
-charge capacity: ``float``, [MW]
-    Maximum capacity to charge the storage or the group of storages.
-    
-discharge capacity: ``float``, [MW]
-    Maximum capacity to discharge the storage or the group of storages.
-
-charge efficiency: ``float``, [-]
-    Charging efficiency of the storage or the group of storages.
-    
-discharge efficiency: ``float``, [-]
-    Discharging efficiency of the storage or the group of storages.
-    
-loss rate: ``float``, [-]
-    The relative loss of the energy content of the storage. For example a loss
-    rate or `0.01` means that the energy content of the storage will be
-    reduced by `1%` in each time step.
 
     
 Power lines
@@ -508,6 +453,16 @@ capacity: ``float``, [MW]
     
 efficiency:``float``, [-]
     The transmission efficiency of the power line.
+    
+Electricity storages
+++++++++++++++++++++
+
+``key:`` 'storages', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
+
+Electricity storages is a particular case of storages (see
+`Storages`_). The condition to use a storage as electrcitiy storage
+is to use storage medium = electricity.
+
 
 Heating sector (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -780,4 +735,248 @@ source: ``str``, [-]
 
 source region: ``str``, [-]
     The region where the source comes from.
+    
+
+Other (optional)
+~~~~~~~~~~~~~~~~
+
+.. contents::
+    :depth: 1
+    :local:
+    :backlinks: top
+
+
+Storages
+++++++++
+
+``key:`` 'storages', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
+
+Different type of storages can be defined in this table. All different
+storage technologies (pumped hydro, batteries, compressed air, hydrogen, etc) have to be
+entered in a general way. Each row can indicate one storage or a group of
+storages. If the storage medium is electricity, then the storage must exist in a region DEXX. Otherwise, the storage can be defined under DE. It is possible to add additional columns for information purposes.
+
++------+------+----------------+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
+|      |      | storage medium | energy content | energy inflow | charge capacity | discharge capacity | charge efficiency | discharge efficiency | loss rate |
++------+------+----------------+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
+| DE01 | S1   | electricity    |                |               |                 |                    |                   |                      |           |
++------+------+----------------+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
+|      | S2   | electricity    |                |               |                 |                    |                   |                      |           |
++------+------+----------------+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
+| DE02 | S1   | electricity    |                |               |                 |                    |                   |                      |           |
++------+------+----------------+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
+| DE   | S3   | hydrogen       |                |               |                 |                    |                   |                      |           |
++------+------+----------------+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
+| ...  | ...  | ...            | ...            | ...           | ...             | ...                | ...               | ...                  | ...       |
++------+------+----------------+----------------+---------------+-----------------+--------------------+-------------------+----------------------+-----------+
+
+**INDEX**
+
+level 0: ``str``
+    Region (e.g. DE01, DE02).
+level 1: ``str``
+    Name, arbitrary.
+    
+**COLUMNS**
+
+storage medium: ``str``
+    The medium used to store energy. The storage medium must be defined in commodities, or it must be electricity.
+
+energy content: ``float``, [MWh]
+    The maximum energy content of a storage or a group storages.
+
+energy inflow: ``float``, [MWh]
+    The amount of energy that will feed into the storage of the model period in
+    MWh. For example a river into a pumped hydroelectric energy storage.
+    
+charge capacity: ``float``, [MW]
+    Maximum capacity to charge the storage or the group of storages.
+    
+discharge capacity: ``float``, [MW]
+    Maximum capacity to discharge the storage or the group of storages.
+
+charge efficiency: ``float``, [-]
+    Charging efficiency of the storage or the group of storages.
+    
+discharge efficiency: ``float``, [-]
+    Discharging efficiency of the storage or the group of storages.
+    
+loss rate: ``float``, [-]
+    The relative loss of the energy content of the storage. For example a loss
+    rate or `0.01` means that the energy content of the storage will be
+    reduced by `1%` in each time step.
+
+Other converters
+++++++++++++++++
+
+``key:`` 'other converters', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
+
+Here, other converters than the ones already set, can be defined for linking different buses. A good example here is an electrolyser which connects electricity with hydrogen. Each converter has a source and a target bus with their respective regions. Other converter´s format is analogous to that of power plants and heat plants.
+
++------+---------------+----------+--------------+------------+----------------+-----------------+-------------+---------------+----------+---------------+
+|      |               | capacity | annual limit | efficiency | variable costs | downtime factor | source      | source region | target   | target region |
++------+---------------+----------+--------------+------------+----------------+-----------------+-------------+---------------+----------+---------------+
+| DE   | electrolyser1 |          |              |            |                |                 | electricity | DE01          | hydrogen | DE            |
++------+---------------+----------+--------------+------------+----------------+-----------------+-------------+---------------+----------+---------------+
+| DE   | electrolyser2 |          |              |            |                |                 | electricity | DE02          | hydrogen | DE            |
++------+---------------+----------+--------------+------------+----------------+-----------------+-------------+---------------+----------+---------------+
+| DE01 | C1            |          |              |            |                |                 | S1          | DE01          | T1       | DE01          |
++------+---------------+----------+--------------+------------+----------------+-----------------+-------------+---------------+----------+---------------+
+
+**INDEX**
+
+level 0: ``str``
+    Region (e.g. DE01, DE02).
+level 1: ``str``
+    Name, arbitrary. The combination of region and name is the unique
+    identifier for the converter or the group of converters.
+
+**COLUMNS**
+
+capacity: ``float``, [MW]
+    The installed capacity of the converter or the group of converters.
+
+annual limit: ``float``, [MWh]
+    The absolute maximum limit of produced target units within the whole
+    modeling period.
+    
+efficiency: ``float``, [-]
+    The average overall efficiency of the converter or the group of converters.
+    
+variable_costs: ``float``, [€/MWh]
+    The variable costs per produced target unit.
+    
+downtime_factor: ``float``, [-]
+    The time fraction of the modeling period in which the converter or the
+    group of converters cannot produce target units. The installed capacity
+    will be reduced by this factor ``capacity * (1 - downtime_factor)``.
+
+source: ``str``, [-]
+    The source bus of the converter or group of converters. The combination
+    of `source_region` and `source` must exist in the commodity sources table or it can be electricity with its region DEXX.
+
+
+source_region, [-]
+    The source region of the source. Typically this is the region of the
+    index or ``DE`` if it is a global commodity source.
+    
+target: ``str``, [-]
+    The target bus of the converter or group of converters. The combination
+    of `target_region` and `target` must exist in the commodity sources table or it can be electricity with its region DEXX.
+
+
+trget_region, [-]
+    The target region of the target. Typically this is the region of the
+    index or ``DE`` if it is a global commodity target.
+    
+Other demand series
++++++++++++++++++++
+
+``key:`` 'other demand series', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
+
+Here, other demands different from electricity, heat or mobility can be entered as time series. Examples are hydrogen or synthetic fuel for the industry sector.
+The demands can be entered regionally under DEXX or supra-regional under DE. The format here is analogous to that of electricity, heat and mobility demand series.
+
+
++-------------+---------------------+---------------------+---------------------+
+|             |         DE01        |         DE02        |          DE         |
++-------------+----------+----------+----------+----------+----------+----------+
+|             |    D1    |    D2    |    D1    |    D3    | hydrogen | syn fuel |
++-------------+----------+----------+----------+----------+----------+----------+
+|             | sector 1 | sector 1 | sector 2 | sector 3 | industry | industry |
++-------------+----------+----------+----------+----------+----------+----------+
+| Time step 1 |          |          |          |          |          |          |
++-------------+----------+----------+----------+----------+----------+----------+
+| Time step 2 |          |          |          |          |          |          |
++-------------+----------+----------+----------+----------+----------+----------+
+| ...         | ...      | ...      | ...      | ...      | ...      | ...      |
++-------------+----------+----------+----------+----------+----------+----------+
+
+**INDEX**
+
+time step: ``int``
+    Number of time step. Must be uniform in all series tables.
+
+**COLUMNS**
+
+unit: ``[MW]``
+
+level 0: ``str``
+    Region (e.g. DE01, DE02 or DE).
+
+level 1: ``str``
+    Name. Specification of the series e.g. `hydrogen`, `syn fuel`.
+
+level 2: ``str``
+    Sector name. Specification of the series e.g. `industry`, `LULUCF`. This extra level is used to differentiate the sector in which the commodity is used, since the same commodity may be used in different sectors.
+    
+
+
+
+Demand response
+++++++++++++++++++++
+
+``key:`` 'demand response', ``value:`` `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_
+
+Demand response, also known as demand side management is used to represent flexibility in the demand time series. Because of that it is applied on the four different demand series. There is the option of using two different methods of demand response: the interval and the delay one. The documentation of both methods con be found in  `SinkDSM <https://oemof-solph.readthedocs.io/en/latest/usage.html#oemof-solph-custom-sinkdsm-label>`_ where the interval method corresponds to "oemof" and the delay to "DIW" method. Depending on whether the interval or delay method is used, the shift interval or delay columns must be used. Finally, there is also the option of adding a price to use this feature.
+
++---------------------------+------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+|                           |      |             |          | capacity up | capacity down |  method  | shift interval | delay | cost up | cost down |
++---------------------------+------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+|   mobility demand series  | DE01 | electricity |   None   |             |               | interval | 8              | 0     |         |           |
+|                           +------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+|                           | DE02 | electricity |   None   |             |               | interval | 8              | 0     |         |           |
+|                           +------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+|                           |  DE  |     oil     |   None   |             |               |   delay  | 0              | 10    |         |           |
++---------------------------+------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+| electricity demand series | DE01 |     all     |   None   |             |               | interval | 8              | 0     |         |           |
+|                           +------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+|                           | DE02 | indsutry    |   None   |             |               | interval | 8              | 0     |         |           |
+|                           +------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+|                           | DE02 | buildings   |   None   |             |               | interval | 8              | 0     |         |           |
++---------------------------+------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+| heat demand series        | DE01 | heat pump   |   None   |             |               | interval | 6              | 0     |         |           |
+|                           +------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+|                           | DE   | natural gas |   None   |             |               | delay    | 6              | 0     |         |           |
++---------------------------+------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+| other demand series       | DE   | hydrogen    | indsutry |             |               | delay    | 0              | 12    |         |           |
++---------------------------+------+-------------+----------+-------------+---------------+----------+----------------+-------+---------+-----------+
+
+
+**INDEX**
+
+level 0: ``str``
+    Name of the demand serie.
+level 1: ``str``
+    Region (e.g. DE01, DE02 or DE)
+level 2: ``str``
+    Specification of the serie. The combination of `region` and
+    `specification of the serie` has to exist in the corresponding `demand serie` sheet.
+level 3: ``str``
+    Sector name. This extra index is for when `other demand series` is used. If this is not the case, just write `None` instead.
+
+**COLUMNS**
+
+capacity up: ``float``, [MW]
+    The maximum limit with respect to the demand, to which the demand can be increased.
+
+capacity down: ``float``, [MW]
+    The minimum limit with respect to the demand, to which the demand can be reduced.
+
+method: ``str``, [-]
+    The method chosen to be used.
+
+shift interval: ``str``, [-]
+    If the interval method is used, this column indicates the maximum interval that the demand can be shifted.
+
+delay: ``str``, [-]
+    If the deelay method is used, this column indicates the maximum delay that demand can be shifted.
+    
+cost up: ``float``, [€/MWh]
+    The variable costs per shifted up unit
+
+cost down: ``float``, [€/MWh]
+    The variable costs per shifted down unit.
+    
+
 

@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Analyses of deflex.
+Analyses of the electricity sector. These function may work with multi-sectoral
+scenarios as well, but one has to consider the effects on the results.
+
+If there are chp plants in the system for example the results might be
+distorted.
 
 SPDX-FileCopyrightText: 2016-2021 Uwe Krien <krien@uni-bremen.de>
 
@@ -86,7 +90,7 @@ def merit_order_from_scenario(
     if with_co2_price and "co2_price" in transf:
         transf["costs_total"] += transf["co2_price"] * transf[
             "fuel_emission"
-        ].div(1000).div(transf["efficiency"])
+        ].div(transf["efficiency"])
 
     transf.sort_values(["costs_total", "capacity"], inplace=True)
     transf["capacity_cum"] = transf.capacity.cumsum().div(1000)
@@ -98,7 +102,7 @@ def get_line_inflows(result):
         x
         for x in result["Main"].keys()
         if isinstance(x[1], solph.Bus)
-        and x[1].label.tag == "electricity"
+        and x[1].label.cat == "electricity"
         and not x[0].label.cat == "line"
     ]
 
@@ -208,7 +212,6 @@ def merit_order_from_results(result):
             )
             / values.loc[label, "efficiency"]
         )
-
     values = values.loc[values["fuel"] != "no fuel"]
     values.sort_values(["costs_total", "capacity"], inplace=True)
     values["capacity_cum"] = values.capacity.cumsum().div(1000)
@@ -258,218 +261,3 @@ def check_comparision_of_merit_order(scenario):
         mo_scenario[compare_columns], mo_results[compare_columns]
     )
     print("Check passed! Both merit order DataFrame tables are the same.")
-
-
-def get_flow_results(result):
-    """
-    Extract values from the flows and calculate key values.
-
-    Parameters
-    ----------
-    result : dict
-        A deflex results dictionary.
-
-    Returns
-    -------
-    The results for each flow of a solved deflex scenario : pandas.DataFrame
-
-    Examples
-    --------
-    >>> from deflex.tools import TEST_PATH, fetch_test_files
-    >>> from deflex import postprocessing as pp
-    >>> from deflex.analyses import get_flow_results
-    >>> fn1 = fetch_test_files("de17_heat.dflx")
-    >>> my_result = pp.restore_results(fn1)
-    >>> res = get_flow_results(my_result)
-    >>> round(res.loc[34, ("cost", "specific", "trsf")].max(), 2)
-    209.34
-    """
-    inflows = get_line_inflows(result)
-    levels = [[], [], [], []]
-    seq = pd.DataFrame(
-        columns=pd.MultiIndex(levels=levels, codes=levels),
-        index=range(len(result["Main"][inflows[0]]["sequences"])),
-    )
-
-    for flow in inflows:
-        seq[flow[0].label] = (
-            result["Main"][flow]["sequences"].reset_index(drop=True).flow
-        )
-    mo = merit_order_from_results(result)
-
-    seq = pd.concat(
-        [seq, seq.div(seq).fillna(0)], axis=1, keys=["absolute", "specific"]
-    )
-    seq = pd.concat([seq], axis=1, keys=["values"])
-
-    mo.rename(
-        columns={"spec_emission": "emission", "costs_total": "cost"},
-        inplace=True,
-    )
-
-    for weight in ["emission", "cost"]:
-        for mode in ["absolute", "specific"]:
-            temp = seq["values", mode].mul(mo[weight])
-            temp = pd.concat([temp], axis=1, keys=[(weight, mode)])
-            seq = pd.concat([seq, temp], axis=1)
-            seq.sort_index(1, inplace=True)
-
-    return seq
-
-
-def calculate_market_clearing_price(result=None, flow_results=None):
-    """
-    Market Clearing Price (MCP), the costs of the most expensive
-    running power plant, excluding chp.
-
-    Parameters
-    ----------
-    result : deflex.Scenario.result
-        A results dictionary from a deflex scenario.
-    flow_results
-        A flow results dictionary from the :py:func:`~get_flow_results`
-        function.
-
-    Returns
-    -------
-    Market clearing price : pandas.Series
-
-    Examples
-    --------
-    >>> from deflex.tools import fetch_test_files
-    >>> from deflex import postprocessing as pp
-    >>> from deflex.analyses import calculate_market_clearing_price
-    >>> fn1 = fetch_test_files("de17_heat.dflx")
-    >>> my_result = pp.restore_results(fn1)
-    >>> mcp = calculate_market_clearing_price(my_result)
-    >>> round(mcp.mean(), 2)
-    39.78
-    >>> round(mcp.max(), 2)
-    45.76
-
-    """
-    if flow_results is None:
-        flow_results = get_flow_results(result)
-    if "chp" in flow_results["cost", "specific", "trsf"].columns:
-        mcp = flow_results.drop(("cost", "specific", "trsf", "chp"), axis=1)[
-            "cost", "specific"
-        ].max(axis=1)
-    else:
-        mcp = flow_results["cost", "specific"].max(axis=1)
-    return mcp
-
-
-def calculate_emissions_most_expensive_pp(result=None, flow_results=None):
-    """
-    The emissions of the most expensive running power plant. CHP plants are
-    excluded.
-
-    Parameters
-    ----------
-    result : deflex.Scenario.result
-        A results dictionary from a deflex scenario.
-    flow_results
-        A flow results dictionary from the :py:func:`~get_flow_results`
-        function.
-
-    Returns
-    -------
-    The specific emissions of the most expensive power plant : pandas.Series
-
-    Examples
-    --------
-    >>> from deflex.tools import fetch_test_files
-    >>> from deflex import postprocessing as pp
-    >>> from deflex.analyses import calculate_market_clearing_price
-    >>> fn1 = fetch_test_files("de17_heat.dflx")
-    >>> my_result = pp.restore_results(fn1)
-    >>> emissions_mcp = calculate_emissions_most_expensive_pp(my_result)
-    >>> round(emissions_mcp.mean(), 2)
-    863.98
-    >>> round(emissions_mcp.max(), 2)
-    1642.28
-    """
-    if flow_results is None:
-        flow_results = get_flow_results(result)
-
-    if "chp" in flow_results["cost", "specific", "trsf"].columns:
-        mcp_id = flow_results.drop(
-            ("cost", "specific", "trsf", "chp"), axis=1
-        )["cost", "specific"].idxmax(axis=1)
-    else:
-        mcp_id = flow_results["cost", "specific"].idxmax(axis=1)
-
-    emissions = flow_results["emission", "specific"]
-    emissions_most_expensive = pd.Series(
-        emissions.lookup(*zip(*pd.DataFrame(data=mcp_id).to_records()))
-    )
-    return emissions_most_expensive
-
-
-def get_key_values_from_results(results, **switch):
-    """
-    Extract key values from a list of solph results dictionaries.
-
-     * emissions_most_expensive_pp: The emissions of the most expensive running
-       power plant, excluding chp
-     * mcp: Market Clearing Price (MCP), the costs of the most expensive
-            running power plant, excluding chp.
-
-    To exclude some of the values above one can set them to false with
-    ``mcp=False`` and so on.
-
-    If typical values are missing, please open an
-    `issue <https://github.com/reegis/deflex>`_.
-
-    Parameters
-    ----------
-    results : list
-        A list of solph results dictionaries.
-
-    Other Parameters
-    ----------------
-    emissions_average : bool
-    emissions_most_expensive_pp : bool
-    mcp : bool
-
-    Returns
-    -------
-    pandas.DataFrame : Key values for each result dictionary with MultiIndex
-        columns.
-
-    Examples
-    --------
-    >>> from deflex.tools import TEST_PATH, fetch_test_files
-    >>> from deflex import postprocessing as pp
-    >>> from deflex.analyses import get_key_values_from_results
-    >>> fn1 = fetch_test_files("de17_heat.dflx")
-    >>> fn2 = fetch_test_files("de02_heat.dflx")
-    >>> my_results = pp.restore_results([fn1, fn2])
-    >>> kv = get_key_values_from_results(my_results)
-    >>> list(kv.columns.get_level_values(1).unique())
-    ['deflex_2014_de17_heat_reg-merit', 'deflex_2014_de02_heat_reg-merit']
-    >>> round(kv.loc[34, ("mcp", "deflex_2014_de17_heat_reg-merit")], 2)
-    42.16
-    >>> list(kv.columns.get_level_values(0).unique())
-    ['mcp', 'emissions_most_expensive_pp']
-    >>> kv = get_key_values_from_results(my_results, mcp=False)
-    >>> list(kv.columns.get_level_values(0).unique())
-    ['emissions_most_expensive_pp']
-    """
-    key_values = {
-        "mcp": calculate_market_clearing_price,
-        "emissions_most_expensive_pp": calculate_emissions_most_expensive_pp,
-    }
-
-    kv = pd.DataFrame(columns=pd.MultiIndex(levels=[[], []], codes=[[], []]))
-    for r in results:
-        name = r["meta"]["name"]
-        flrs = get_flow_results(r)
-        for key, func in key_values.items():
-            if switch.get(key, True) is True:
-                kv[key, name] = func(flow_results=flrs)
-    return kv
-
-
-if __name__ == "__main__":
-    pass

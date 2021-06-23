@@ -16,16 +16,13 @@ from unittest.mock import MagicMock
 
 import pandas as pd
 from reegis import config
-from scenario_builder import demand
-from scenario_builder import feedin
-from scenario_builder import powerplants
+from scenario_builder import demand, feedin, powerplants
 
 from deflex import __file__ as dfile
 from deflex import config as cfg
 from deflex import scenario as st
-from deflex import scenario_creator
-from deflex.geometries import deflex_power_lines
-from deflex.geometries import deflex_regions
+from deflex.creator import scenario_creator
+from deflex.geometries import deflex_power_lines, deflex_regions
 from deflex.tools import TEST_PATH
 
 
